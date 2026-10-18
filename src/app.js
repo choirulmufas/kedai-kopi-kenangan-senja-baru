@@ -1,11 +1,11 @@
 document.addEventListener("alpine:init", () => {
   Alpine.data("products", () => ({
     items: [
-      { id: 1, name: "Robusta Brazil", img: "1.jpg", price: 20000 },
-      { id: 2, name: "Arabica Blend", img: "2.jpg", price: 25000 },
-      { id: 3, name: "Primo Passo", img: "3.jpg", price: 30000 },
-      { id: 4, name: "Aceh Gayo", img: "4.jpg", price: 35000 },
-      { id: 5, name: "Sumatra Mandheling", img: "5.jpg", price: 40000 },
+      { id: 1, name: "Robusta Brazil", img: "1.jpg", price: 20000, description: "Rasa kuat dengan sentuhan cokelat yang cocok untuk teman memulai hari." },
+      { id: 2, name: "Arabica Blend", img: "2.jpg", price: 25000, description: "Perpaduan aroma lembut dan rasa seimbang untuk dinikmati perlahan." },
+      { id: 3, name: "Primo Passo", img: "3.jpg", price: 30000, description: "Karakter manis dan aroma harum untuk momen santai di sore hari." },
+      { id: 4, name: "Aceh Gayo", img: "4.jpg", price: 35000, description: "Cita rasa kaya dengan sedikit nuansa rempah khas dataran tinggi." },
+      { id: 5, name: "Sumatra Mandheling", img: "5.jpg", price: 40000, description: "Body tebal dan rasa earthy yang meninggalkan akhir cerita panjang." },
     ],
   }));
 
@@ -72,31 +72,32 @@ document.addEventListener("alpine:init", () => {
 });
 
 // Form Validation
+document.addEventListener("alpine:initialized", () => {
 const checkoutButton = document.querySelector(".checkout-button");
-checkoutButton.disabled = true;
-
 const form = document.querySelector("#checkoutForm");
-form.addEventListener("keyup", function () {
-  for (let i = 0; i < form.elements.length; i++) {
-    if (form.elements[i].value.length !== 0) {
-      checkoutButton.classList.remove("disabled");
-      checkoutButton.classList.add("disabled");
-    } else {
-      return false;
-    }
-  }
-  checkoutButton.disabled = false;
-  checkoutButton.classList.remove("disabled");
-});
+const updateCheckoutButton = () => {
+  const cart = Alpine.store("cart");
+  const valid = form.checkValidity() && Boolean(cart && cart.items.length);
+  checkoutButton.disabled = !valid;
+  checkoutButton.classList.toggle("disabled", !valid);
+};
+
+updateCheckoutButton();
+form.addEventListener("input", updateCheckoutButton);
 
 // kirim data ketika tombol checkout diklik
-checkoutButton.addEventListener('click', async function (e) {
+form.addEventListener('submit', async function (e) {
   e.preventDefault();
+  const cart = Alpine.store("cart");
+  if (!form.checkValidity() || !cart || cart.items.length === 0) {
+    form.reportValidity();
+    return;
+  }
+
+  checkoutButton.disabled = true;
+  checkoutButton.textContent = "Memproses...";
   const formData = new FormData(form);
   const data = new URLSearchParams(formData);
-  const objData = Object.fromEntries(data);
-  //const message = formatMessage(objData);
-  //window.open('http://wa.me/628993593890?text=' + encodeURIComponent(message));
 
   // minta transaction token menggunakan ajax / fetch
   try {
@@ -105,10 +106,35 @@ checkoutButton.addEventListener('click', async function (e) {
       body: data,
     });
     const token = await response.text();
-    window.snap.pay(token);
+    if (!response.ok) {
+      throw new Error(token || `Gagal membuat transaksi (HTTP ${response.status}).`);
+    }
+    if (!window.snap) {
+      throw new Error("Midtrans Snap belum termuat. Periksa koneksi atau script sandbox.");
+    }
+    window.snap.pay(token, {
+      onSuccess: () => {
+        window.location.href = "?payment=success";
+      },
+      onPending: () => {
+        window.location.href = "?payment=pending";
+      },
+      onError: () => {
+        alert("Pembayaran gagal diproses.");
+      },
+      onClose: () => {
+        checkoutButton.disabled = false;
+        checkoutButton.textContent = "Bayar dengan Midtrans";
+      },
+    });
   } catch (err) {
     console.log(err.message);
+    alert(err.message);
+  } finally {
+    updateCheckoutButton();
+    checkoutButton.textContent = "Bayar dengan Midtrans";
   }
+});
 });
 
 // format pesan whatsapp

@@ -6,16 +6,6 @@ document.addEventListener("DOMContentLoaded", () => {
     navbarNav.classList.toggle("active");
   };
 
-  // Toggle class active untuk search form
-  const searchForm = document.querySelector(".search-form");
-  const searchBox = document.querySelector("#search-box");
-
-  document.querySelector("#search-button").onclick = (e) => {
-    e.preventDefault();
-    searchForm.classList.toggle("active");
-    searchBox.focus();
-  };
-
   // Toggle class active untuk shopping cart
   const shoppingCart = document.querySelector(".shopping-cart");
   document.querySelector("#shopping-cart-button").onclick = (e) => {
@@ -25,15 +15,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Klik fi luar elemen
   const hm = document.querySelector("#hamburger-menu");
-  const sb = document.querySelector("#search-button");
   const sc = document.querySelector("#shopping-cart-button");
 
   document.addEventListener("click", function (e) {
     if (!hm.contains(e.target) && !navbarNav.contains(e.target)) {
       navbarNav.classList.remove("active");
-    }
-    if (!sb.contains(e.target) && !searchForm.contains(e.target)) {
-      searchForm.classList.remove("active");
     }
     if (!sc.contains(e.target) && !shoppingCart.contains(e.target)) {
       shoppingCart.classList.remove("active");
@@ -42,14 +28,28 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Modal Box
   const itemDetailModal = document.querySelector("#item-detail-modal");
-  const itemDetailButtons = document.querySelectorAll(".item-detail-button");
+  let selectedProduct = null;
+  const modalImage = document.querySelector("#modal-product-image");
+  const modalName = document.querySelector("#modal-product-name");
+  const modalDescription = document.querySelector("#modal-product-description");
+  const modalPrice = document.querySelector("#modal-product-price");
 
-  itemDetailButtons.forEach((btn) => {
-    btn.onclick = (e) => {
-      itemDetailModal.style.display = "flex";
-      e.preventDefault();
-    };
+  window.addEventListener("product-detail", (event) => {
+    selectedProduct = event.detail;
+    modalImage.src = `img/products/${selectedProduct.img}`;
+    modalImage.alt = selectedProduct.name;
+    modalName.textContent = selectedProduct.name;
+    modalDescription.textContent = selectedProduct.description;
+    modalPrice.textContent = rupiah(selectedProduct.price);
+    itemDetailModal.style.display = "flex";
   });
+
+  document.querySelector("#modal-add-cart").onclick = (e) => {
+    e.preventDefault();
+    if (!selectedProduct) return;
+    Alpine.store("cart").add(selectedProduct);
+    itemDetailModal.style.display = "none";
+  };
 
   // klik tombol close modal
   document.querySelector(".modal .close-icon").onclick = (e) => {
