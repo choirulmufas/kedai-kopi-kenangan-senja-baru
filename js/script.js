@@ -6,6 +6,42 @@ document.addEventListener("DOMContentLoaded", () => {
     navbarNav.classList.toggle("active");
   };
 
+  const navLinks = [...navbarNav.querySelectorAll("a")];
+  const setActiveNav = (targetId) => {
+    navLinks.forEach((link) => {
+      link.classList.toggle("active", link.getAttribute("href") === targetId);
+    });
+  };
+
+  navLinks.forEach((link) => {
+    link.addEventListener("click", () => {
+      setActiveNav(link.getAttribute("href"));
+      // Panel sengaja tetap terbuka agar pengguna bisa memilih menu lain.
+    });
+  });
+
+  setActiveNav(window.location.hash || "#home");
+  window.addEventListener("hashchange", () => {
+    setActiveNav(window.location.hash || "#home");
+  });
+
+  const sections = [...document.querySelectorAll("#home, #about, #menu, #products, #contact")];
+  const updateActiveFromScroll = () => {
+    const marker = window.scrollY + document.querySelector(".navbar").offsetHeight + 40;
+    let currentSection = sections[0];
+
+    sections.forEach((section) => {
+      if (section.offsetTop <= marker) {
+        currentSection = section;
+      }
+    });
+
+    setActiveNav(`#${currentSection.id}`);
+  };
+
+  window.addEventListener("scroll", updateActiveFromScroll, { passive: true });
+  updateActiveFromScroll();
+
   // Toggle class active untuk shopping cart
   const shoppingCart = document.querySelector(".shopping-cart");
   document.querySelector("#shopping-cart-button").onclick = (e) => {

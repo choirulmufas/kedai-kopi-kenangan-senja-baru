@@ -114,10 +114,10 @@ form.addEventListener('submit', async function (e) {
     }
     window.snap.pay(token, {
       onSuccess: () => {
-        window.location.href = "?payment=success";
+        window.location.href = `${window.location.pathname}?payment=success`;
       },
       onPending: () => {
-        window.location.href = "?payment=pending";
+        window.location.href = `${window.location.pathname}?payment=pending`;
       },
       onError: () => {
         alert("Pembayaran gagal diproses.");

@@ -30,8 +30,9 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 1.4rem 7%;
-    background-color: rgba(1, 1, 1, 0.8);
-    border-bottom: 1px solid #664c33;
+    background-color: rgba(1, 1, 1, 0.86);
+    border-bottom: 1px solid rgba(182, 137, 91, 0.45);
+    backdrop-filter: blur(0.8rem);
     position: fixed;
     top: 0;
     left: 0;
@@ -54,24 +55,31 @@ body {
     color: #fff;
     display: inline-block;
     font-size: 1.3rem;
-    margin: 0 1rem;
+    margin: 0 0.25rem;
+    padding: 0.55rem 0.9rem;
+    border-radius: 99rem;
+    transition: color 0.2s ease, background-color 0.2s ease;
 }
 
 .navbar .navbar-nav a:hover {
     color: var(--primary);
 }
 
+.navbar .navbar-nav a.active {
+    color: #fff;
+    background: rgba(182, 137, 91, 0.2);
+}
+
+.navbar .navbar-nav a.active::after {
+    display: none;
+}
+
 .navbar .navbar-nav a::after {
-    content: '';
-    display: block;
-    padding-bottom: 0.5rem;
-    border-bottom: 0.1rem solid var(--primary);
-    transform: scaleX(0);
-    transition: 0.2s linear;
+    display: none;
 }
 
 .navbar .navbar-nav a:hover::after{
-    transform: scaleX(0.5);
+    display: none;
 }
 
 .navbar .navbar-extra a{
@@ -778,18 +786,58 @@ footer .credit a {
     width: 100%;
     height: 100%;
     overflow: auto;
-    background-color: rgba(0, 0, 0, 0.7);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    background-color: rgba(0, 0, 0, 0.82);
+    backdrop-filter: blur(0.25rem);
 }
 
 .modal-container {
     position: relative;
-    background-color: #fefefe;
-    color: var(--bg);
-    margin: 15% auto;
-    padding: 1.2rem;
-    border: 1px solid #666;
-    width: 80%;
+    background: linear-gradient(145deg, #241911, #100d0a);
+    color: #fff;
+    margin: 0 auto;
+    padding: 2rem;
+    border: 1px solid rgba(182, 137, 91, 0.5);
+    border-radius: 0.8rem;
+    width: min(88rem, 100%);
+    box-shadow: 0 2rem 5rem rgba(0, 0, 0, 0.45);
     animation: animateModal 0.5s;
+    overflow: hidden;
+}
+
+/* Dekorasi biji kopi 2D yang halus di background modal */
+.modal-container::before,
+.modal-container::after {
+    content: "";
+    position: absolute;
+    width: 8rem;
+    height: 5rem;
+    border: 1px solid rgba(196, 154, 112, 0.2);
+    border-radius: 65% 35% 60% 40%;
+    background: radial-gradient(ellipse at 35% 30%, rgba(156, 101, 57, 0.3), rgba(57, 33, 19, 0.15) 68%, transparent 70%);
+    box-shadow: inset 0.5rem -0.4rem 1rem rgba(0, 0, 0, 0.2);
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+.modal-container::before {
+    right: -1.5rem;
+    top: 2rem;
+    transform: rotate(28deg);
+}
+
+.modal-container::after {
+    left: -2rem;
+    bottom: 1.5rem;
+    transform: rotate(-25deg) scale(0.75);
+}
+
+.modal-container > * {
+    position: relative;
+    z-index: 1;
 }
 
 /* Modal Animation */
@@ -806,34 +854,90 @@ footer .credit a {
 
 .modal-container .close-icon {
     position: absolute;
-    right: 1rem;
+    top: 1.2rem;
+    right: 1.2rem;
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    color: #d8c5b2;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 50%;
+    transition: 0.2s ease;
+}
+
+.modal-container .close-icon:hover {
+    color: #21170f;
+    background: var(--primary);
+    border-color: var(--primary);
 }
 
 .modal-content {
     display: flex;
-    flex-wrap: nowrap;
+    align-items: center;
+    gap: 2.5rem;
 }
 
 .modal-content img {
-    height: 20rem;
-    margin-right: 2rem;
-    margin-bottom: 2rem;
+    flex: 0 0 30rem;
+    width: 30rem;
+    height: 30rem;
+    margin: 0;
+    object-fit: cover;
+    border-radius: 0.5rem;
+}
+
+.modal-content .product-content {
+    flex: 1;
+    padding: 1rem 3rem 1rem 0;
+}
+
+.modal-content h3 {
+    color: #fff;
+    font-size: 2rem;
+    margin-bottom: 1rem;
 }
 
 .modal-content p {
-    font-size: 1.2rem;
-    line-height: 1.8rem;
-    margin-top: 1.2rem;
+    color: #d1c1b2;
+    font-size: 1.15rem;
+    line-height: 1.7;
+    margin: 0;
+}
+
+.modal-content .product-stars {
+    display: flex;
+    gap: 0.25rem;
+    color: var(--primary);
+    margin: 1.4rem 0 0.8rem;
+}
+
+.modal-content .product-stars svg {
+    fill: var(--primary);
+}
+
+.modal-content .product-price {
+    color: #e9c49d;
+    font-size: 1.4rem;
+    font-weight: 700;
 }
 
 .modal-content a {
     display: flex;
+    align-items: center;
     gap: 1rem;
-    width: 12rem;
+    width: fit-content;
     background-color: var(--primary);
     color: #fff;
-    margin-top: 1rem;
+    border-radius: 0.35rem;
+    margin-top: 1.5rem;
     padding: 1rem 1.6rem;
+    transition: 0.2s ease;
+}
+
+.modal-content a:hover {
+    background-color: #c49a70;
+    transform: translateY(-0.15rem);
 }
 
 /* Media Queries */
@@ -857,21 +961,38 @@ footer .credit a {
         position: absolute;
         top: 100%;
         right: -100%;
-        background-color: #fff;
-        width: 30rem;
+        background: linear-gradient(180deg, #241911, #110d0a);
+        border-left: 1px solid rgba(182, 137, 91, 0.45);
+        box-shadow: -1rem 1rem 2rem rgba(0, 0, 0, 0.3);
+        width: min(30rem, 82vw);
         height: 100vh;
-        transition: 0.3s;
+        padding: 1.8rem 0;
+        border-radius: 0 0 0 1rem;
+        transition: right 0.3s ease;
     }
 
     .navbar .navbar-nav.active {
         right: 0;
     }
     .navbar .navbar-nav a {
-        color: var(--bg);
+        color: #f4eee8;
         display: block;
-        margin: 1.5rem;
-        padding: 0.5rem;
-        font-size: 2rem;
+        margin: 0.5rem 1.2rem;
+        padding: 1rem 1.2rem;
+        border-radius: 0.4rem;
+        font-size: 1.8rem;
+        transition: 0.2s ease;
+    }
+
+    .navbar .navbar-nav a:hover {
+        color: #fff;
+        background: rgba(182, 137, 91, 0.16);
+    }
+
+    .navbar .navbar-nav a.active {
+        color: #fff;
+        background: rgba(182, 137, 91, 0.22);
+        box-shadow: inset 0.25rem 0 var(--primary);
     }
 
     .navbar .navbar-nav a::after {
@@ -932,6 +1053,22 @@ footer .credit a {
 
     .modal-content {
         flex-wrap: wrap;
+        gap: 1.5rem;
+    }
+
+    .modal-container {
+        width: 100%;
+        padding: 1.4rem;
+    }
+
+    .modal-content img {
+        flex: 0 0 auto;
+        width: 100%;
+        height: min(22rem, 60vw);
+    }
+
+    .modal-content .product-content {
+        padding: 0 0.5rem 0.5rem;
     }
 }
 
